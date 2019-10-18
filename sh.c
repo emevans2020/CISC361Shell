@@ -18,7 +18,6 @@ void StringtoArray(char *input,char** cmds){
 	char* temp;
 	temp=strtok(input," ");
 	if (temp==NULL){
-
 		cmds[0]=malloc(1*sizeof(char));
 		cmds[0][0]=0;
 		return;
@@ -124,7 +123,7 @@ char *which(char *command, struct pathelement *pathlist )
 {
 	/* loop through pathlist until finding command and return it.  Return
    	NULL when not found. */
-	   char* result=malloc(BUFFERSIZE);
+	char* result=malloc(BUFFERSIZE);
 	while (pathlist) {         // WHICH
     	sprintf(result, "%s/%s", pathlist->element,command);
     if (access(result, X_OK) == 0) {
@@ -139,12 +138,13 @@ char *which(char *command, struct pathelement *pathlist )
 char *where(char *command, struct pathelement *pathlist )
 {
   /* similarly loop through finding all locations of command */
-  while (pathlist) {         // WHERE
-    sprintf(command, "%s/gcc", pathlist->element);
-    if (access(command, F_OK) == 0)
-      printf("[%s]\n", command);
-    pathlist = pathlist->next;
-  }
+	char* result=malloc(BUFFERSIZE);
+	while (pathlist) {         // WHERE
+	sprintf(command, "%s/%s", pathlist->element,command);
+	if (access(command, F_OK) == 0)
+		printf("[%s]\n", command);
+	pathlist = pathlist->next;
+	}
   printf (command,": Command not found.");
   return NULL;
 } /* where() */
