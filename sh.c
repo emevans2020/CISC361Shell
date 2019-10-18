@@ -12,29 +12,29 @@
 #include "sh.h"
 
 #define BUFFERSIZE 128
-void StringtoArray(char *input,char** cmds);
+// void StringtoArray(char *input,char** cmds);
 
-		void StringtoArray(char *input,char** cmds){
-			char* temp;
-			temp=strtok(input," ");
-			if (temp==NULL){
+void StringtoArray(char *input,char** cmds){
+	char* temp;
+	temp=strtok(input," ");
+	if (temp==NULL){
 
-				cmds[0]=malloc(1*sizeof(char));
-				cmds[0][0]=0;
-				return;
-			}
-			int len=strlen(temp);
-			cmds[0]=malloc(sizeof(char)*len+1);
-			strcpy(cmds[0],temp);
-			int i=1;
-			while ((temp=strtok(NULL," "))!=NULL){
-				len=strlen(temp);
-				cmds[i]=malloc(sizeof(char)*len+1);
-				strcpy(cmds[i],temp);
-				i++;
-			}
-			cmds[i]=NULL;
-		}
+		cmds[0]=malloc(1*sizeof(char));
+		cmds[0][0]=0;
+		return;
+	}
+	int len=strlen(temp);
+	cmds[0]=malloc(sizeof(char)*len+1);
+	strcpy(cmds[0],temp);
+	int i=1;
+	while ((temp=strtok(NULL," "))!=NULL){
+		len=strlen(temp);
+		cmds[i]=malloc(sizeof(char)*len+1);
+		strcpy(cmds[i],temp);
+		i++;
+	}
+	cmds[i]=NULL;
+}
 
 int sh( int argc, char **argv, char **envp ){
 	char *prompt = calloc(PROMPTMAX, sizeof(char));
@@ -87,7 +87,7 @@ int sh( int argc, char **argv, char **envp ){
 				printf("%s",path);
 				free(path);
 			}
-			else printf("Not found");
+			else printf("Not found\n");
 		}
 		else if (!strcmp(args[0],"where")){
 
