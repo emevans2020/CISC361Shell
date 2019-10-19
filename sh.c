@@ -87,9 +87,10 @@ int sh(int argc, char **argv, char **envp)
 
 		if (!strcmp(args[0], "exit"))
 		{
-			go = 0;
+			printf ("Exiting Now!!! \n");
+			go=0;
 		}
-		if (!strcmp(args[0], "which"))
+		else if (!strcmp(args[0], "which"))
 		{
 			char *path = which(args[1], pathlist);
 			if (args[1] == NULL)
@@ -111,7 +112,7 @@ int sh(int argc, char **argv, char **envp)
 				}
 			}
 		}
-		if (!strcmp(args[0], "where"))
+		else if (!strcmp(args[0], "where"))
 		{
 			char *path = which(args[1], pathlist);
 			if (args[1] == NULL)
@@ -133,18 +134,18 @@ int sh(int argc, char **argv, char **envp)
 				}
 			}
 		}
-		if (!strcmp(args[0], "pwd")) {
-			void printPWD();
+		else if (!strcmp(args[0], "pwd")) {
+			printPWD();
 		}
 
-		if (!strcmp(args[0], "pid")) {
-			void printPid();
+		else if (!strcmp(args[0], "pid")) {
+			printPid();
 		}
 		/* check for each built in command and implement */
-		if (!strcmp(args[0], "list")) {
+		else if (!strcmp(args[0], "list")) {
 			
 		}
-		if(!strcmp(args[0],"prompt")){
+		else if(!strcmp(args[0],"prompt")){
 			newPrompt(args[1],prompt);
 		}
 		else
@@ -160,14 +161,11 @@ int sh(int argc, char **argv, char **envp)
 			else
 			{
 				//try to exec the absolute path
-				execve(cmd, args, envp);
-				printf("exec %s\n", args[0]);
+				// execve(cmd, args, envp);
+				// printf("exec %s\n", args[0]);
 				exit(0);
 			}
 		}
-
-
-
 		/*  else  program to exec */
 		/* find it */
 		/* do fork(), execve() and waitpid() */
