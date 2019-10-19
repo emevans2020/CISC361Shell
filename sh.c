@@ -96,20 +96,23 @@ int sh(int argc, char **argv, char **envp)
 			if (args[1] == NULL)
 			{
 				printf("Which needs an argument\n");
+			} else {
+			for (int i = 1;i < MAXARGS; i++){
+				if (args[i] != NULL)
+				{
+					char *path = which(args[i], pathlist);
+					if (path)
+					{
+						// printf("hi");
+						printf("%s\n", path);
+						free(path);
+					}
+					else
+					{
+						printf("%s Could Not Find: %s\n", args[0],args[i]);
+					}
+				}
 			}
-			// printf ("%s",path);
-			if (args[1] != NULL)
-			{
-				if (path)
-				{
-					// printf("hi");
-					printf("%s\n", path);
-					free(path);
-				}
-				else
-				{
-					printf("%s Could Not Find: %s\n", args[0],args[1]);
-				}
 			}
 		}
 		else if (!strcmp(args[0], "where"))
