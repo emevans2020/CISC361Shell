@@ -89,16 +89,15 @@ int sh(int argc, char **argv, char **envp)
 		{
 			go = 0;
 		}
-		else if (!strcmp(args[0], "which"))
+		if (!strcmp(args[0], "which"))
 		{
-			//printf("%s",args[0]);
 			char *path = which(args[1], pathlist);
 			if (args[1] == NULL)
 			{
-				printf("Which needs an argument");
+				printf("Which needs an argument\n");
 			}
 			// printf ("%s",path);
-			if (arg[1] != NULL)
+			if (args[1] != NULL)
 			{
 				if (path)
 				{
@@ -184,7 +183,7 @@ void list(char *dir)
 	direct = opendir(dir);
 	if (direct == NULL)
 	{
-		printf("Cannot open:%s\n", direct);
+		perror(dir);
 	}
 	else
 	{
