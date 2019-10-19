@@ -107,12 +107,31 @@ int sh(int argc, char **argv, char **envp)
 				}
 				else
 				{
-					printf("Could Not Find: %s\n", args[0]);
+					printf("%s Could Not Find: %s\n", args[0],args[1]);
 				}
 			}
 		}
 		if (!strcmp(args[0], "where"))
 		{
+			char *path = which(args[1], pathlist);
+			if (args[1] == NULL)
+			{
+				printf("Where needs an argument\n");
+			}
+			// printf ("%s",path);
+			if (args[1] != NULL)
+			{
+				if (path)
+				{
+					// printf("hi");
+					printf("%s\n", path);
+					free(path);
+				}
+				else
+				{
+					printf("%s Could Not Find: %s\n", args[0],args[1]);
+				}
+			}
 		}
 		else
 		{
@@ -132,7 +151,6 @@ int sh(int argc, char **argv, char **envp)
 				exit(0);
 			}
 		}
-
 		/* check for each built in command and implement */
 
 		/*  else  program to exec */
