@@ -133,6 +133,13 @@ int sh(int argc, char **argv, char **envp)
 				}
 			}
 		}
+		if (!strcmp(args[0], "pwd")) {
+			void printPWD();
+		}
+
+		if (!strcmp(args[0], "pid")) {
+			void printPid();
+		}
 		/* check for each built in command and implement */
 		if (!strcmp(args[0], "list")) {
 			
@@ -203,6 +210,12 @@ char *where(char *command, struct pathelement *pathlist)
 	return NULL;
 } /* where() */
 
+void printPWD(){
+	char cwd[BUFFERSIZE];
+	getcwd(cwd,sizeof(cwd));
+	printf("%s\n",cwd);
+} /* printPWD() */
+
 void list(char *dir)
 { /* see man page for opendir() and readdir() and print out filenames for
   the directory passed */
@@ -249,3 +262,9 @@ void newPrompt(char *command, char *p)
     strcpy(p, command);
   }
 } /* newPrompt() */
+
+void printPid(){
+	printf("");
+	int pid = getpid();
+	printf("%d\n", pid);
+} /* printPid() */
