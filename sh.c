@@ -106,10 +106,12 @@ int sh(int argc, char **argv, char **envp)
 					free(path);
 				}
 				else
+				{
 					printf("Could Not Find: %s\n", args[0]);
+				}
 			}
 		}
-		else if (!strcmp(args[0], "where"))
+		if (!strcmp(args[0], "where"))
 		{
 		}
 		else
