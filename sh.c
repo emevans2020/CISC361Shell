@@ -133,6 +133,13 @@ int sh(int argc, char **argv, char **envp)
 				}
 			}
 		}
+		/* check for each built in command and implement */
+		if (!strcmp(args[0], "list")) {
+			
+		}
+		if(!strcmp(args[0],"prompt")){
+			newPrompt(args[1],prompt);
+		}
 		else
 		{
 			//call which to get the absolute path
@@ -151,7 +158,8 @@ int sh(int argc, char **argv, char **envp)
 				exit(0);
 			}
 		}
-		/* check for each built in command and implement */
+
+
 
 		/*  else  program to exec */
 		/* find it */
@@ -219,3 +227,25 @@ void printenv(char **envp)
 {
 
 } /* printenv() */
+
+void newPrompt(char *command, char *p) 
+{
+  char buffer[BUFFERSIZE];
+  int len;
+  if (command == NULL) 
+  {
+    command = malloc(sizeof(char) * PROMPTMAX);
+    printf("Input new prompt prefix: ");
+    if (fgets(buffer, BUFFERSIZE, stdin) != NULL) {
+    len = (int) strlen(buffer);
+    buffer[len - 1] = '\0';
+    strcpy(command, buffer);
+    }
+    strcpy(p, command);
+    free(command);
+  }
+  else 
+  {
+    strcpy(p, command);
+  }
+} /* newPrompt() */
