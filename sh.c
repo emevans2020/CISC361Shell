@@ -11,7 +11,7 @@
 #include <signal.h>
 #include "sh.h"
 
-#define BUFFERSIZE 128
+#define BUFFERSIZE 256
 
 void StringtoArray(char *input, char **cmds);
 
@@ -91,16 +91,24 @@ int sh(int argc, char **argv, char **envp)
 		}
 		else if (!strcmp(args[0], "which"))
 		{
-			char *path = which(args[0], pathlist);
-
-			if (path)
+			//printf("%s",args[0]);
+			char *path = which(args[1], pathlist);
+			if (args[1] == NULL)
 			{
-				printf("hi");
-				printf("%s", path);
-				free(path);
+				printf("Which needs an argument");
 			}
-			else
-				printf("Not found\n");
+			// printf ("%s",path);
+			if (arg[1] != NULL)
+			{
+				if (path)
+				{
+					// printf("hi");
+					printf("%s\n", path);
+					free(path);
+				}
+				else
+					printf("Could Not Find: %s\n", args[0]);
+			}
 		}
 		else if (!strcmp(args[0], "where"))
 		{
