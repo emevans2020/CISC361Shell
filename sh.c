@@ -161,7 +161,7 @@ int sh(int argc, char **argv, char **envp)
 				while (envp[i] != NULL) {
 					printf("%s\n", envp[i]);
 					i++;
-					}
+				}
 			}
 			else if (args[1] != NULL && args[2] == NULL)
 			{ /*prints specificed env variable*/
