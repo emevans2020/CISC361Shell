@@ -87,8 +87,8 @@ int sh(int argc, char **argv, char **envp)
 
 		if (!strcmp(args[0], "exit"))
 		{
-			printf ("Exiting Now!!! \n");
-			go=0;
+			printf("Executing built-in %s\n", args[0]);
+			go = 0;
 		}
 		else if (!strcmp(args[0], "which"))
 		{
@@ -96,23 +96,26 @@ int sh(int argc, char **argv, char **envp)
 			if (args[1] == NULL)
 			{
 				printf("Which needs an argument\n");
-			} else {
-			for (int i = 1;i < MAXARGS; i++){
-				if (args[i] != NULL)
+			}
+			else
+			{
+				for (int i = 1; i < MAXARGS; i++)
 				{
-					char *path = which(args[i], pathlist);
-					if (path)
+					if (args[i] != NULL)
 					{
-						// printf("hi");
-						printf("%s\n", path);
-						free(path);
-					}
-					else
-					{
-						printf("%s Could Not Find: %s\n", args[0],args[i]);
+						char *path = which(args[i], pathlist);
+						if (path)
+						{
+							// printf("hi");
+							printf("%s\n", path);
+							free(path);
+						}
+						else
+						{
+							printf("%s Could Not Find: %s\n", args[0], args[i]);
+						}
 					}
 				}
-			}
 			}
 		} /* end of which */
 		else if (!strcmp(args[0], "where"))
@@ -121,37 +124,70 @@ int sh(int argc, char **argv, char **envp)
 			if (args[1] == NULL)
 			{
 				printf("Where needs an argument\n");
-			} else {
-			for (int i = 1;i < MAXARGS; i++){
-				if (args[i] != NULL)
+			}
+			else
+			{
+				for (int i = 1; i < MAXARGS; i++)
 				{
-					char *path = where(args[i], pathlist);
-					if (path)
+					if (args[i] != NULL)
 					{
-						printf("%s\n", path);
-						free(path);
-					}
-					else
-					{
-						printf("%s Could Not Find: %s\n", args[0],args[i]);
+						char *path = where(args[i], pathlist);
+						if (path)
+						{
+							printf("%s\n", path);
+							free(path);
+						}
+						else
+						{
+							printf("%s Could Not Find: %s\n", args[0], args[i]);
+						}
 					}
 				}
 			}
-			}
 		} /* end of where */
-		else if (!strcmp(args[0], "pwd")) {
+		else if (!strcmp(args[0], "pwd"))
+		{
+			printf("Executing built-in %s\n", args[0]);
 			printPWD();
 		}
 
-		else if (!strcmp(args[0], "pid")) {
+		else if (!strcmp(args[0], "printenv"))
+		{ /*prints environment*/
+			printf("Executing built-in %s\n", args[0]);
+			//if proper amount of arguments
+			if (args[0] != NULL && args[1] == NULL)
+			{ /*prints whole environment*/
+				int i = 0;
+				while (envp[i] != NULL) {
+					printf("%s\n", envp[i]);
+					i++;
+					}
+			}
+			else if (args[1] != NULL && args[2] == NULL)
+			{ /*prints specificed env variable*/
+				printenv(&args[1]);
+			}
+			//if passed in more than 2 arguments
+			else
+			{
+				perror("printenv");
+				printf("printenv: Too many arguments.\n");
+			}
+		}
+
+		else if (!strcmp(args[0], "pid"))
+		{
+			printf("Executing built-in %s\n", args[0]);
 			printPid();
 		}
 		/* check for each built in command and implement */
-		else if (!strcmp(args[0], "list")) {
-			
-		}
-		else if(!strcmp(args[0],"prompt")){
-			newPrompt(args[1],prompt);
+		// else if (!strcmp(args[0], "list"))
+		// {
+		// }
+		else if (!strcmp(args[0], "prompt"))
+		{
+			printf("Executing built-in %s\n", args[0]);
+			newPrompt(args[1], prompt);
 		}
 		else
 		{
@@ -168,7 +204,13 @@ int sh(int argc, char **argv, char **envp)
 				//try to exec the absolute path
 				// execve(cmd, args, envp);
 				// printf("exec %s\n", args[0]);
-				exit(0);
+				//Run the program.
+				if (execve(cmd, args, envp) < 0)
+				{
+					//If execve() returns a negative value, the program could not be found.
+					printf("%s: Command not found.\n", args[0]);
+					exit(0);
+				}
 			}
 		}
 		/*  else  program to exec */
@@ -215,10 +257,11 @@ char *where(char *command, struct pathelement *pathlist)
 	return NULL;
 } /* where() */
 
-void printPWD(){
+void printPWD()
+{
 	char cwd[BUFFERSIZE];
-	getcwd(cwd,sizeof(cwd));
-	printf("%s\n",cwd);
+	getcwd(cwd, sizeof(cwd));
+	printf("%s\n", cwd);
 } /* printPWD() */
 
 void list(char *dir)
@@ -243,32 +286,35 @@ void list(char *dir)
 
 void printenv(char **envp)
 {
-
+	char **currEnv = envp;
+	printf("%s\n", getenv(*currEnv));
 } /* printenv() */
 
-void newPrompt(char *command, char *p) 
+void newPrompt(char *command, char *p)
 {
-  char buffer[BUFFERSIZE];
-  int len;
-  if (command == NULL) 
-  {
-    command = malloc(sizeof(char) * PROMPTMAX);
-    printf("Input new prompt prefix: ");
-    if (fgets(buffer, BUFFERSIZE, stdin) != NULL) {
-    len = (int) strlen(buffer);
-    buffer[len - 1] = '\0';
-    strcpy(command, buffer);
-    }
-    strcpy(p, command);
-    free(command);
-  }
-  else 
-  {
-    strcpy(p, command);
-  }
+	char buffer[BUFFERSIZE];
+	int len;
+	if (command == NULL)
+	{
+		command = malloc(sizeof(char) * PROMPTMAX);
+		printf("Input new prompt prefix: ");
+		if (fgets(buffer, BUFFERSIZE, stdin) != NULL)
+		{
+			len = (int)strlen(buffer);
+			buffer[len - 1] = '\0';
+			strcpy(command, buffer);
+		}
+		strcpy(p, command);
+		free(command);
+	}
+	else
+	{
+		strcpy(p, command);
+	}
 } /* newPrompt() */
 
-void printPid(){
+void printPid()
+{
 	printf("");
 	int pid = getpid();
 	printf("%d\n", pid);
