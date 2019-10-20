@@ -189,12 +189,12 @@ int sh(int argc, char **argv, char **envp)
 			printf("Executing built-in %s\n", args[0]);
 			newPrompt(args[1], prompt);
 		}
-		else
+		else /*  else  program to exec */
 		{
 			//call which to get the absolute path
-			char *cmd = which(args[0], pathlist);
+			char *cmd = which(args[0], pathlist); 		/* find it using which */
 			int pid = fork();
-			if (pid)
+			if (pid)   	/* do fork(), execve() and waitpid() */
 			{
 				free(cmd);
 				waitpid(pid, NULL, 0);
@@ -208,16 +208,11 @@ int sh(int argc, char **argv, char **envp)
 				if (execve(cmd, args, envp) < 0)
 				{
 					//If execve() returns a negative value, the program could not be found.
-					printf("%s: Command not found.\n", args[0]);
+		 			fprintf(stderr, "%s: Command not found.\n", args[0]);
 					exit(0);
 				}
 			}
 		}
-		/*  else  program to exec */
-		/* find it */
-		/* do fork(), execve() and waitpid() */
-		/* else */
-		/* fprintf(stderr, "%s: Command not found.\n", args[0]); */
 	}
 	return 0;
 } /* sh() */
