@@ -356,5 +356,9 @@ void setEmptyEnv(char *name) {
 void setValToEnv(char *arg1, char *arg2) { 
 	// command to set environment when provided more than one command
 	setenv(arg1,arg2,1);
-}
+} /* setValToEnv() */
 /* end of commands for set environment */
+
+// void cd(char *path){
+// 	chdir(path);
+// } /* cd() */
