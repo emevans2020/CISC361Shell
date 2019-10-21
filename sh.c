@@ -213,10 +213,15 @@ int sh(int argc, char **argv, char **envp)
 			printf("Executing built-in %s\n", args[0]);
 			printPid();
 		}
-		/* check for each built in command and implement */
-		// else if (!strcmp(args[0], "list"))
-		// {
-		// }
+
+		else if (!strcmp(args[0], "kill")){
+			
+		}
+		
+		else if (!strcmp(args[0], "list"))
+		{
+
+		}
 		else if (!strcmp(args[0], "prompt"))
 		{
 			printf("Executing built-in %s\n", args[0]);
@@ -362,3 +367,7 @@ void setValToEnv(char *arg1, char *arg2) {
 // void cd(char *path){
 // 	chdir(path);
 // } /* cd() */
+
+void killProcess(pid_t pid, int sig){
+	kill(pid, sig);
+}
