@@ -175,6 +175,39 @@ int sh(int argc, char **argv, char **envp)
 			}
 		}
 
+		else if (!strcmp(args[0], "setenv")){
+			printf("Executing built-in %s\n", args[0]);
+			
+			if (args[0] != NULL && args[1] == NULL)
+			{ /*prints whole environment if ran with no arguments*/
+				int i = 0;
+				while (envp[i] != NULL) {
+					printf("%s\n", envp[i]);
+					i++;
+				}
+			}
+			// ran with one argument set that as an empty environment variable
+			else if (args[1] != NULL && args[2] == NULL){
+				setEmptyEnv(args[1]);
+			}
+			// when ran with two arguments the second one is the value of the first
+			else if(args[1] != NULL && args[2] != NULL) {
+				setValToEnv (args[1],args[2]);
+				/*PATH special case, must free path list before setenv on PATH*/
+				if(!strcmp(args[1],"PATH")) {
+					free(pathlist);
+					pathlist = get_path();
+				}
+				if (strcmp(args[1], "HOME") == 0) {
+					homedir = getenv("HOME");
+				}
+			}
+			else { /* when ran with >2 args prints the same error message to stderr that tcsh does */
+				perror("setenv");
+				printf("setenv: Too many arguments.\n");
+			}
+		}	
+
 		else if (!strcmp(args[0], "pid"))
 		{
 			printf("Executing built-in %s\n", args[0]);
@@ -315,3 +348,13 @@ void printPid()
 	printf("%d\n", pid);
 } /* printPid() */
 
+/* commands following set the environment */
+void setEmptyEnv(char *name) {
+	setenv(name,"",1);
+}
+
+void setValToEnv(char *arg1, char *arg2) { 
+	// command to set environment when provided more than one command
+	setenv(arg1,arg2,1);
+}
+/* end of commands for set environment */
