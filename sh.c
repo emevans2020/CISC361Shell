@@ -72,6 +72,11 @@ int sh(int argc, char **argv, char **envp)
 	/* Put PATH into a linked list */
 	pathlist = get_path();
 
+	//watches for Ctrl+C, Ctrl+Z
+	// signal(SIGINT, sigIntHandler);
+	// signal(SIGTSTP, sigStpHandler);
+
+
 	while (go)
 	{
 		/* print your prompt */
@@ -215,7 +220,13 @@ int sh(int argc, char **argv, char **envp)
 		}
 
 		else if (!strcmp(args[0], "kill")){
-			
+			if (args[0] != NULL && args[1] != NULL && args[2] == NULL)
+			{
+				killProcess(atoi(args[1]), 0);
+			}
+			else if(args[0] != NULL && args[1] != NULL && args[2] != NULL){
+				killProcess(atoi(args[2]), -1*atoi(args[1]));
+			}
 		}
 		
 		else if (!strcmp(args[0], "list"))
@@ -243,6 +254,7 @@ int sh(int argc, char **argv, char **envp)
 				// execve(cmd, args, envp);
 				// printf("exec %s\n", args[0]);
 				//Run the program.
+				
 				if (execve(cmd, args, envp) < 0)
 				{
 					//If execve() returns a negative value, the program could not be found.
@@ -369,5 +381,20 @@ void setValToEnv(char *arg1, char *arg2) {
 // } /* cd() */
 
 void killProcess(pid_t pid, int sig){
-	kill(pid, sig);
+	if (sig == 0){
+		kill(pid,SIGTERM);
+	}
+	else {
+		kill(pid, sig);
+	}
 }
+
+/* signal handler functions below */
+void sigIntHandler(int sig_num) 
+{ 
+    /* Reset handler to catch SIGINT next time.*/
+    signal(SIGINT, sigIntHandler); 
+    printf("\n Cannot be terminated using Ctrl+C \n"); 
+    fflush(stdout); 
+
+} 
