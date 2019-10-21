@@ -196,7 +196,7 @@ int sh(int argc, char **argv, char **envp)
 				setEmptyEnv(args[1]);
 			}
 			// when ran with two arguments the second one is the value of the first
-			else if(args[1] != NULL && args[2] != NULL) {
+			else if(args[1] != NULL && args[2] != NULL && args[3] == NULL) {
 				setValToEnv (args[1],args[2]);
 				/*PATH special case, must free path list before setenv on PATH*/
 				if(!strcmp(args[1],"PATH")) {
@@ -254,7 +254,6 @@ int sh(int argc, char **argv, char **envp)
 				// execve(cmd, args, envp);
 				// printf("exec %s\n", args[0]);
 				//Run the program.
-				
 				if (execve(cmd, args, envp) < 0)
 				{
 					//If execve() returns a negative value, the program could not be found.
@@ -376,9 +375,9 @@ void setValToEnv(char *arg1, char *arg2) {
 } /* setValToEnv() */
 /* end of commands for set environment */
 
-// void cd(char *path){
-// 	chdir(path);
-// } /* cd() */
+void cd(char *path){
+	chdir(path);
+} /* cd() */
 
 void killProcess(pid_t pid, int sig){
 	if (sig == 0){
