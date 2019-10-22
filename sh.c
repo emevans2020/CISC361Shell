@@ -77,6 +77,7 @@ int sh(int argc, char **argv, char **envp)
 	//watches for Ctrl+C, Ctrl+Z
 	signal(SIGINT, sigIntHandler);
 	signal(SIGTSTP, sigStpHandler);
+	signal(SIGTERM, sigStpHandler);
 
 	while (go)
 	{
@@ -279,18 +280,20 @@ int sh(int argc, char **argv, char **envp)
 		{
 			printf("Executing built-in %s\n", args[0]);
 			/*list everything if not args*/
-			if (args[0] == NULL && args[1] == NULL && args[2] == NULL)
+			if (args[0] != NULL && args[1] == NULL && args[2] == NULL)
 			{
-				getcwd(cwd, sizeof(cwd));
 				list(cwd);
 			}
 			else
-			{ /*lists for every folder passed in by user*/
-				int i = 1;
-				while (args[i] != NULL)
+			{
+				/*lists for every folder passed in by user*/
+				for (int i = 1; i < MAXARGS; i++)
 				{
-					list(args[i]);
-					i++;
+					if (args[i] != NULL)
+					{
+						printf("[%s]:\n", args[i]);
+						list(args[i]);
+					}
 				}
 			}
 		}
