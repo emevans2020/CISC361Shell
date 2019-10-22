@@ -90,6 +90,12 @@ int sh(int argc, char **argv, char **envp)
 		int len = strlen(buf);
 		buf[len - 1] = 0;
 
+		/* get command line and process & also checks for ctrl D*/
+		if (fgets(buf, BUFFERSIZE, stdin) == NULL) {
+			printf("Use exit to leave mysh.\n");
+			continue;
+		}
+
 		StringtoArray(buf, args);
 
 		if (!strcmp(args[0], "exit"))
