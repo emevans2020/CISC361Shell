@@ -52,7 +52,7 @@ int sh(int argc, char **argv, char **envp)
 	struct passwd *password_entry;
 	char *homedir;
 	struct pathelement *pathlist;
-	char* previousPath = malloc(1024*sizeof(char));
+	char *previousPath = malloc(1024 * sizeof(char));
 
 	uid = getuid();
 	password_entry = getpwuid(uid);   /* get passwd info */
@@ -164,7 +164,8 @@ int sh(int argc, char **argv, char **envp)
 			if (args[0] != NULL && args[1] == NULL)
 			{ /*prints whole environment*/
 				int i = 0;
-				while (envp[i] != NULL) {
+				while (envp[i] != NULL)
+				{
 					printf("%s\n", envp[i]);
 					i++;
 				}
@@ -181,79 +182,117 @@ int sh(int argc, char **argv, char **envp)
 			}
 		}
 
-		else if (!strcmp(args[0], "setenv")){
+		else if (!strcmp(args[0], "setenv"))
+		{
 			printf("Executing built-in %s\n", args[0]);
-			
+
 			if (args[0] != NULL && args[1] == NULL)
 			{ /*prints whole environment if ran with no arguments*/
 				int i = 0;
-				while (envp[i] != NULL) {
+				while (envp[i] != NULL)
+				{
 					printf("%s\n", envp[i]);
 					i++;
 				}
 			}
 			// ran with one argument set that as an empty environment variable
-			else if (args[1] != NULL && args[2] == NULL){
+			else if (args[1] != NULL && args[2] == NULL)
+			{
 				setEmptyEnv(args[1]);
 			}
 			// when ran with two arguments the second one is the value of the first
-			else if(args[1] != NULL && args[2] != NULL && args[3] == NULL) {
-				setValToEnv (args[1],args[2]);
+			else if (args[1] != NULL && args[2] != NULL && args[3] == NULL)
+			{
+				setValToEnv(args[1], args[2]);
 				/*PATH special case, must free path list before setenv on PATH*/
-				if(!strcmp(args[1],"PATH")) {
+				if (!strcmp(args[1], "PATH"))
+				{
 					free(pathlist);
 					pathlist = get_path();
 				}
-				if (strcmp(args[1], "HOME") == 0) {
+				if (strcmp(args[1], "HOME") == 0)
+				{
 					homedir = getenv("HOME");
 				}
 			}
-			else { /* when ran with >2 args prints the same error message to stderr that tcsh does */
+			else
+			{ /* when ran with >2 args prints the same error message to stderr that tcsh does */
 				perror("setenv");
 				printf("setenv: Too many arguments.\n");
 			}
-		}	
+		}
 
-		else if (!strcmp(args[0], "cd")){
-			if (args[2]){
-				fprintf(stderr,"Too many arguments\n");
+		else if (!strcmp(args[0], "cd"))
+		{
+			if (args[2])
+			{
+				fprintf(stderr, "Too many arguments\n");
 			}
-			else if (args[1]) {
-				if (!strcmp(args[1],"-")){
-					strcpy(pwd,owd);
-					free(owd);
-					owd = getcwd(NULL,PATH_MAX+1);
-					chdir(pwd);
-				}
-				else {
-					free(pwd);
-					free(owd);
-					owd = getcwd (NULL, PATH_MAX+1);
-					chdir(args[1]);
-					pwd = getcwd(NULL, PATH_MAX+1);
+			if (!args[1])
+			{
+				chdir(getenv("HOME"));
+				free(pwd);
+				pwd = getcwd(NULL, PATH_MAX + 1);
+			}
+			else
+			{
+				if (args[1])
+				{
+					if (!strcmp(args[1], "-"))
+					{
+						strcpy(pwd, owd);
+						free(owd);
+						owd = getcwd(NULL, PATH_MAX + 1);
+						chdir(pwd);
+					}
+					else
+					{
+						free(pwd);
+						free(owd);
+						owd = getcwd(NULL, PATH_MAX + 1);
+						chdir(args[1]);
+						pwd = getcwd(NULL, PATH_MAX + 1);
+					}
 				}
 			}
 		}
-		
+
 		else if (!strcmp(args[0], "pid"))
 		{
 			printf("Executing built-in %s\n", args[0]);
 			printPid();
 		}
 
-		else if (!strcmp(args[0], "kill")){
+		else if (!strcmp(args[0], "kill"))
+		{
 			if (args[0] != NULL && args[1] != NULL && args[2] == NULL)
 			{
 				killProcess(atoi(args[1]), 0);
 			}
-			else if(args[0] != NULL && args[1] != NULL && args[2] != NULL){
-				killProcess(atoi(args[2]), -1*atoi(args[1]));
+			else if (args[0] != NULL && args[1] != NULL && args[2] != NULL)
+			{
+				killProcess(atoi(args[2]), -1 * atoi(args[1]));
 			}
 		}
-		
+
 		else if (!strcmp(args[0], "list"))
 		{
-
+			printf("Executing built-in %s\n", args[0]);
+			/*list everything if not args*/
+			if (args[0] == NULL && args[1] == NULL && args[2] == NULL)
+			{
+				getcwd(cwd, sizeof(cwd));
+				list(cwd);
+			}
+			else
+			{ /*lists for every folder passed in by user*/
+				int i = 1;
+				while (args[i] != NULL)
+				{
+					list(args[i]);
+					i++;
+				}
+			}
 		}
 		else if (!strcmp(args[0], "prompt"))
 		{
@@ -263,9 +302,9 @@ int sh(int argc, char **argv, char **envp)
 		else /*  else  program to exec */
 		{
 			//call which to get the absolute path
-			char *cmd = which(args[0], pathlist); 		/* find it using which */
+			char *cmd = which(args[0], pathlist); /* find it using which */
 			int pid = fork();
-			if (pid)   	/* do fork(), execve() and waitpid() */
+			if (pid) /* do fork(), execve() and waitpid() */
 			{
 				free(cmd);
 				waitpid(pid, NULL, 0);
@@ -279,7 +318,7 @@ int sh(int argc, char **argv, char **envp)
 				if (execve(cmd, args, envp) < 0)
 				{
 					//If execve() returns a negative value, the program could not be found.
-		 			fprintf(stderr, "%s: Command not found.\n", args[0]);
+					fprintf(stderr, "%s: Command not found.\n", args[0]);
 					exit(0);
 				}
 			}
@@ -387,43 +426,52 @@ void printPid()
 } /* printPid() */
 
 /* commands following set the environment */
-void setEmptyEnv(char *name) {
-	setenv(name,"",1);
+void setEmptyEnv(char *name)
+{
+	setenv(name, "", 1);
 }
 
-void setValToEnv(char *arg1, char *arg2) { 
+void setValToEnv(char *arg1, char *arg2)
+{
 	// command to set environment when provided more than one command
-	setenv(arg1,arg2,1);
+	setenv(arg1, arg2, 1);
 } /* setValToEnv() */
 /* end of commands for set environment */
 
-void killProcess(pid_t pid, int sig){
-	if (sig == 0){
-		kill(pid,SIGTERM);
+void killProcess(pid_t pid, int sig)
+{
+	if (sig == 0)
+	{
+		kill(pid, SIGTERM);
 	}
-	else {
+	else
+	{
 		kill(pid, sig);
 	}
 }
 
 /* signal handler functions below */
-void sigIntHandler(int sig) 
-{ 
-    /* Reset handler to catch SIGINT next time.*/
-    signal(SIGINT, sigIntHandler); 
-  	printf("\n Cannot be terminated using Ctrl+C %d \n", waitpid(getpid(),NULL,0));
-    fflush(stdout); 
+void sigIntHandler(int sig)
+{
+	/* Reset handler to catch SIGINT next time.*/
+	signal(SIGINT, sigIntHandler);
+	printf("\n Cannot be terminated using Ctrl+C %d \n", waitpid(getpid(), NULL, 0));
+	fflush(stdout);
 	return;
-} 
+}
 
 /*ctrl z handler*/
-void sigStpHandler(int sig) {
-  signal(SIGTSTP, sigStpHandler);
-  printf("\n Cannot be terminated using Ctrl+Z \n");
-  fflush(stdout);
+void sigStpHandler(int sig)
+{
+	signal(SIGTSTP, sigStpHandler);
+	printf("\n Cannot be terminated using Ctrl+Z \n");
+	fflush(stdout);
 }
-void sig_chldHandler(int sig) {
-  int saved_errno = errno;
-  while (waitpid((pid_t)(-1), 0, WNOHANG) > 0) {}
-  errno = saved_errno;
+void sig_chldHandler(int sig)
+{
+	int saved_errno = errno;
+	while (waitpid((pid_t)(-1), 0, WNOHANG) > 0)
+	{
+	}
+	errno = saved_errno;
 }
