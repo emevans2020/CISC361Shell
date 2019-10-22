@@ -13,6 +13,7 @@ void setEmptyEnv(char *name);
 void setValToEnv(char *arg1, char *arg2);
 void killProcess(pid_t pid, int sig);
 void sigIntHandler(int sig_num);
+void sigStpHandler(int sig);
 
 #define PROMPTMAX 32
 #define MAXARGS 10

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <errno.h>
 #include <string.h>
 #include <strings.h>
 #include <limits.h>
@@ -47,7 +48,7 @@ int sh(int argc, char **argv, char **envp)
 	char *command, *arg, *commandpath, *p, *pwd, *owd, *cwd;
 	char **args = calloc(MAXARGS, sizeof(char *));
 	char cmd[64];
-	int uid, i, status, argsct, go = 1;
+	int uid, i, status, errno, argsct, go = 1;
 	struct passwd *password_entry;
 	char *homedir;
 	struct pathelement *pathlist;
@@ -74,8 +75,8 @@ int sh(int argc, char **argv, char **envp)
 	pathlist = get_path();
 
 	//watches for Ctrl+C, Ctrl+Z
-	// signal(SIGINT, sigIntHandler);
-	// signal(SIGTSTP, sigStpHandler);
+	signal(SIGINT, sigIntHandler);
+	signal(SIGTSTP, sigStpHandler);
 
 	while (go)
 	{
@@ -252,7 +253,7 @@ int sh(int argc, char **argv, char **envp)
 		
 		else if (!strcmp(args[0], "list"))
 		{
-			
+
 		}
 		else if (!strcmp(args[0], "prompt"))
 		{
@@ -406,11 +407,23 @@ void killProcess(pid_t pid, int sig){
 }
 
 /* signal handler functions below */
-void sigIntHandler(int sig_num) 
+void sigIntHandler(int sig) 
 { 
     /* Reset handler to catch SIGINT next time.*/
     signal(SIGINT, sigIntHandler); 
-    printf("\n Cannot be terminated using Ctrl+C \n"); 
+  	printf("\n Cannot be terminated using Ctrl+C %d \n", waitpid(getpid(),NULL,0));
     fflush(stdout); 
-
+	return;
 } 
+
+/*ctrl z handler*/
+void sigStpHandler(int sig) {
+  signal(SIGTSTP, sigStpHandler);
+  printf("\n Cannot be terminated using Ctrl+Z \n");
+  fflush(stdout);
+}
+void sig_chldHandler(int sig) {
+  int saved_errno = errno;
+  while (waitpid((pid_t)(-1), 0, WNOHANG) > 0) {}
+  errno = saved_errno;
+}
