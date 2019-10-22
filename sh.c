@@ -302,30 +302,30 @@ int sh(int argc, char **argv, char **envp)
 			printf("Executing built-in %s\n", args[0]);
 			newPrompt(args[1], prompt);
 		}
-		else /*  else  program to exec */
-		{
 			//call which to get the absolute path
-			char *cmd = which(args[0], pathlist); /* find it using which */
-			int pid = fork();
-			if (pid) /* do fork(), execve() and waitpid() */
-			{
-				free(cmd);
-				waitpid(pid, NULL, 0);
-			}
 			else
 			{
-				//try to exec the absolute path
-				// execve(cmd, args, envp);
-				// printf("exec %s\n", args[0]);
-				//Run the program.
-				if (execve(cmd, args, envp) < 0)
+				char *cmd = which(args[0], pathlist); /* find it using which */
+				int pid = fork();
+				if (pid) /* do fork(), execve() and waitpid() */
 				{
-					//If execve() returns a negative value, the program could not be found.
-					fprintf(stderr, "%s: Command not found.\n", args[0]);
-					exit(0);
+					free(cmd);
+					waitpid(pid, NULL, 0);
+				}
+				else
+				{
+					//try to exec the absolute path
+					// execve(cmd, args, envp);
+					// printf("exec %s\n", args[0]);
+					//Run the program.
+					if (execve(cmd, args, envp) < 0)
+					{
+						//If execve() returns a negative value, the program could not be found.
+						fprintf(stderr, "%s: Command not found.\n", args[0]);
+						exit(0);
+					}
 				}
 			}
-		}
 	}
 	return 0;
 } /* sh() */
@@ -469,12 +469,4 @@ void sigStpHandler(int sig)
 	signal(SIGTSTP, sigStpHandler);
 	printf("\n Cannot be terminated using Ctrl+Z \n");
 	fflush(stdout);
-}
-void sig_chldHandler(int sig)
-{
-	int saved_errno = errno;
-	while (waitpid((pid_t)(-1), 0, WNOHANG) > 0)
-	{
-	}
-	errno = saved_errno;
 }
