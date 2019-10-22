@@ -51,6 +51,7 @@ int sh(int argc, char **argv, char **envp)
 	struct passwd *password_entry;
 	char *homedir;
 	struct pathelement *pathlist;
+	char* previousPath = malloc(1024*sizeof(char));
 
 	uid = getuid();
 	password_entry = getpwuid(uid);   /* get passwd info */
@@ -75,7 +76,6 @@ int sh(int argc, char **argv, char **envp)
 	//watches for Ctrl+C, Ctrl+Z
 	// signal(SIGINT, sigIntHandler);
 	// signal(SIGTSTP, sigStpHandler);
-
 
 	while (go)
 	{
@@ -213,6 +213,27 @@ int sh(int argc, char **argv, char **envp)
 			}
 		}	
 
+		else if (!strcmp(args[0], "cd")){
+			if (args[2]){
+				fprintf(stderr,"Too many arguments\n");
+			}
+			else if (args[1]) {
+				if (!strcmp(args[1],"-")){
+					strcpy(pwd,owd);
+					free(owd);
+					owd = getcwd(NULL,PATH_MAX+1);
+					chdir(pwd);
+				}
+				else {
+					free(pwd);
+					free(owd);
+					owd = getcwd (NULL, PATH_MAX+1);
+					chdir(args[1]);
+					pwd = getcwd(NULL, PATH_MAX+1);
+				}
+			}
+		}
+		
 		else if (!strcmp(args[0], "pid"))
 		{
 			printf("Executing built-in %s\n", args[0]);
@@ -231,7 +252,7 @@ int sh(int argc, char **argv, char **envp)
 		
 		else if (!strcmp(args[0], "list"))
 		{
-
+			
 		}
 		else if (!strcmp(args[0], "prompt"))
 		{
@@ -374,10 +395,6 @@ void setValToEnv(char *arg1, char *arg2) {
 	setenv(arg1,arg2,1);
 } /* setValToEnv() */
 /* end of commands for set environment */
-
-void cd(char *path){
-	chdir(path);
-} /* cd() */
 
 void killProcess(pid_t pid, int sig){
 	if (sig == 0){
