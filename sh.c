@@ -10,9 +10,10 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <glob.h>
 #include "sh.h"
 
-#define BUFFERSIZE 256
+#define BUFFERSIZE 1028
 
 void StringtoArray(char *input, char **cmds);
 
@@ -90,17 +91,24 @@ int sh(int argc, char **argv, char **envp)
 		int len = strlen(buf);
 		buf[len - 1] = 0;
 
+		StringtoArray(buf, args);
+
 		/* get command line and process & also checks for ctrl D*/
-		if (fgets(buf, BUFFERSIZE, stdin) == NULL) {
+		if (buf[0] == 0 || args[0] == NULL) {
 			printf("Use exit to leave mysh.\n");
 			continue;
 		}
 
-		StringtoArray(buf, args);
-
-		if (!strcmp(args[0], "exit"))
+		else if (!strcmp(args[0], "exit"))
 		{
 			printf("Executing built-in %s\n", args[0]);
+			free(pathlist);
+			free(cwd);
+			free(owd);
+			free(prompt);
+			free(commandline);
+			free(args);
+			free(previousPath);
 			go = 0;
 		}
 		else if (!strcmp(args[0], "which"))
@@ -303,14 +311,15 @@ int sh(int argc, char **argv, char **envp)
 				}
 			}
 		}
+
 		else if (!strcmp(args[0], "prompt"))
 		{
 			printf("Executing built-in %s\n", args[0]);
 			newPrompt(args[1], prompt);
 		}
-			//call which to get the absolute path
-			else
-			{
+		//call which to get the absolute path
+		else
+		{	 /* find it */
 				char *cmd = which(args[0], pathlist); /* find it using which */
 				int pid = fork();
 				if (pid) /* do fork(), execve() and waitpid() */
